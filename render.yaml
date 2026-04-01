@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: viralsub
+    runtime: node
+    region: frankfurt
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build && cd ../backend && npm install
+    startCommand: cd backend && node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FFMPEG_PATH
+        value: /usr/bin/ffmpeg
