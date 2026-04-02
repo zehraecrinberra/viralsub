@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { transcribeAudio } from '../services/whisper.js';
 import { translateText, generateHooks } from '../services/gpt.js';
@@ -14,7 +15,12 @@ router.post('/transcribe', async (req, res) => {
     if (!filename) return res.status(400).json({ error: 'Filename required' });
     
     const videoPath = path.join(__dirname, '../uploads', filename);
-    const audioPath = path.join(__dirname, '../temp', `${Date.now()}.mp3`);
+    if (!fs.existsSync(videoPath)) {
+      return res.status(404).json({ error: 'Video file not found. Please re-upload.' });
+    }
+    const tempDir = path.join(__dirname, '../temp');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    const audioPath = path.join(tempDir, `${Date.now()}.mp3`);
     
     await extractAudio(videoPath, audioPath);
     const transcription = await transcribeAudio(audioPath);

@@ -15,6 +15,9 @@ router.post('/render', optionalAuth, async (req, res) => {
     if (!filename || !subtitles) return res.status(400).json({ error: 'Missing required fields' });
     
     const inputPath = path.join(__dirname, '../uploads', filename);
+    if (!fs.existsSync(inputPath)) {
+      return res.status(404).json({ error: 'Video file not found. It may have expired. Please re-upload your video.' });
+    }
     const outputDir = path.join(__dirname, '../outputs');
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     const outputId = uuidv4();
