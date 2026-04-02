@@ -58,7 +58,18 @@ app.use('/api/process', processRouter);
 app.use('/api/export', exportRouter);
 
 // Health check
-app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+app.get('/health', (req, res) => {
+  const key = process.env.OPENAI_API_KEY || '';
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    ai: {
+      keySet: !!key && key !== 'your_openai_api_key_here' && key !== 'placeholder',
+      keyPrefix: key ? key.slice(0, 7) + '...' : 'NOT_SET',
+      keyLength: key.length
+    }
+  });
+});
 
 // Serve frontend in production (after API routes)
 const frontendDist = path.join(__dirname, '../frontend/dist');
