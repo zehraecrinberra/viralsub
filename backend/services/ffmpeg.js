@@ -32,7 +32,8 @@ export function extractAudio(videoPath, outputPath) {
     ffmpeg(videoPath)
       .noVideo()
       .audioCodec('libmp3lame')
-      .audioBitrate('128k')
+      .audioBitrate('64k')
+      .outputOptions(['-threads 1'])
       .output(outputPath)
       .on('end', resolve)
       .on('error', reject)
@@ -95,7 +96,13 @@ export function burnSubtitles({ inputPath, outputPath, subtitles, hook, style, w
     ffmpeg(inputPath)
       .videoCodec('libx264')
       .audioCodec('aac')
-      .outputOptions(['-crf 23', '-preset fast', '-movflags +faststart'])
+      .outputOptions([
+        '-crf 28',
+        '-preset ultrafast',
+        '-movflags +faststart',
+        '-threads 1',
+        '-max_muxing_queue_size 512'
+      ])
       .outputOptions([`-vf`, vfString])
       .output(outputPath)
       .on('end', () => {
