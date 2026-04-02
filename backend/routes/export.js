@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { optionalAuth } from '../middleware/auth.js';
@@ -14,8 +15,10 @@ router.post('/render', optionalAuth, async (req, res) => {
     if (!filename || !subtitles) return res.status(400).json({ error: 'Missing required fields' });
     
     const inputPath = path.join(__dirname, '../uploads', filename);
+    const outputDir = path.join(__dirname, '../outputs');
+    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     const outputId = uuidv4();
-    const outputPath = path.join(__dirname, '../outputs', `${outputId}.mp4`);
+    const outputPath = path.join(outputDir, `${outputId}.mp4`);
     
     const isPremium = plan === 'premium' || (req.user?.plan === 'premium');
     const quality = isPremium ? 'hd' : '720p';

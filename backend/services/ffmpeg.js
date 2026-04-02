@@ -44,8 +44,10 @@ export function burnSubtitles({ inputPath, outputPath, subtitles, hook, style, w
   return new Promise((resolve, reject) => {
     const subtitleStyle = getSubtitleStyle(style || 'tiktok');
 
-    // Create SRT file
-    const srtPath = outputPath.replace('.mp4', '.srt');
+    // Create SRT file in temp directory (guaranteed writable)
+    const tempDir = path.join(__dirname, '../temp');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    const srtPath = path.join(tempDir, path.basename(outputPath).replace('.mp4', '.srt'));
     fs.writeFileSync(srtPath, generateSRT(subtitles));
 
     // Escape text for FFmpeg drawtext (single-quotes + special chars)

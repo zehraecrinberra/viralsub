@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache ffmpeg
+RUN apk add --no-cache ffmpeg font-noto font-noto-arabic fontconfig
 
 WORKDIR /app
 
@@ -15,7 +15,9 @@ COPY backend/package*.json ./backend/
 RUN cd backend && npm install --omit=dev
 COPY backend/ ./backend/
 
-RUN mkdir -p backend/uploads backend/outputs backend/temp backend/data
+# Ensure writable directories exist with correct permissions
+RUN mkdir -p /app/backend/uploads /app/backend/outputs /app/backend/temp /app/backend/data \
+    && chmod -R 777 /app/backend/uploads /app/backend/outputs /app/backend/temp /app/backend/data
 
 EXPOSE 5000
 
